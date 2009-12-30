@@ -54,8 +54,8 @@ def import_csv(args):
                 region, created = Region.objects.get_or_create(name=row['PO_OOI_REGION'])
 
                 if has_datum(row, 'PO_OOI_COUNTRY'):
-                    country, created = Country.objects.get_or_create(name=row['PO_OOI_COUNTRY'])
-                    if created:
+                    country, c_created = Country.objects.get_or_create(name=row['PO_OOI_COUNTRY'])
+                    if c_created:
                         country.region = region
                         country.save()
                     if has_datum(row, 'CATEGORY_DESC'):
@@ -64,6 +64,9 @@ def import_csv(args):
                         except Exception, e:
                             print 'BANG category:'
                             print e
+                            print po_count
+                            print row
+                            continue
 
                         if has_data(row, ['SUPPLIER_COUNTRY', 'SUPPLIER_NAME']):
                             try:
@@ -72,6 +75,9 @@ def import_csv(args):
                             except Exception, e:
                                 print 'BANG supplier:'
                                 print e
+                                print po_count
+                                print row
+                                continue
 
                             if has_data(row, ['MATERIAL_TYPE', 'MATERIAL']):
                                 try:
@@ -79,6 +85,9 @@ def import_csv(args):
                                 except Exception, e:
                                     print 'BANG material:'
                                     print e
+                                    print po_count
+                                    print row
+                                    continue
                                 try:
     # [1] "ProMS.uid"                  "PO_TYPE"                   
     # [3] "MATERIAL_TYPE"              "Item.Line.Value"           
@@ -104,6 +113,9 @@ def import_csv(args):
                                     except Exception, e:
                                         print 'BANG purchase:'
                                         print e
+                                        print po_count
+                                        print row
+                                        continue
 
                                     def format_date(datestr):
                                         # expecting MM/DD/YY
@@ -127,7 +139,9 @@ def import_csv(args):
                                     except Exception, e:
                                         print 'BANG dates:'
                                         print e
+                                        print po_count
                                         print row
+                                        continue
 
                                     # expecting -DD.DD%
                                     # chop off % and cast as decimal
@@ -136,6 +150,9 @@ def import_csv(args):
                                     except Exception, e:
                                         print 'BANG fraction:'
                                         print e
+                                        print po_count
+                                        print row
+                                        continue
 
                                     try:
                                         new_po = PurchaseOrder(country=country,\
@@ -157,14 +174,19 @@ def import_csv(args):
                                             purchase=new_purchase)
                                         new_po.save()
                                         po_count += 1
-                                        if po_count % 1000 == 0:
+                                        if po_count % 400 == 0:
                                             print(po_count)
                                     except Exception, e:
                                         print 'BANG po:'
                                         print e
+                                        print po_count
+                                        print row
+                                        continue
 
                                 except Exception, e:
                                     print(e)
+                                    print po_count
+                                    print row
                                     continue
                 else:
                     print 'NO COUNTRY'
