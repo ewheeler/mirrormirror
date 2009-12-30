@@ -107,7 +107,7 @@ def import_csv(args):
                                     try:
                                         new_purchase = Purchase(material=material,\
                                             unit_price=D(row['UNIT_PRICE (US $)']),\
-                                            quantity=int(row['QUANTITY_ORDERED']),\
+                                            quantity=D(row['QUANTITY_ORDERED']),\
                                             supplier=supplier)
                                         new_purchase.save()
                                     except Exception, e:

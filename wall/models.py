@@ -52,7 +52,10 @@ class PurchaseOrder(models.Model):
 class Purchase(models.Model):
     material = models.ForeignKey('Material')
     unit_price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    quantity = models.PositiveIntegerField(blank=True, null=True)
+    # TODO some countries seem to order fractions of units (?)
+    # things like books (i'm looking at you El Salvador..)
+    #quantity = models.PositiveIntegerField(blank=True, null=True)
+    quantity = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     supplier = models.ForeignKey('Supplier', blank=True, null=True)
 
 class Material(models.Model):
