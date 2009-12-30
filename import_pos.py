@@ -104,9 +104,18 @@ def import_csv(args):
     #[25] "X"                          "X.1"                       
     #[27] "Columns.introduced.by.us"   "Columns.from.ProMS"        
     #[29] "X.2" 
+                                    def format_price(pricestr):
+                                        if pricestr is not None:
+                                            if pricestr != '':
+                                                return pricestr.replace(',', '')
+                                            else:
+                                                return None
+                                        else:
+                                            return None
+
                                     try:
                                         new_purchase = Purchase(material=material,\
-                                            unit_price=D(row['UNIT_PRICE (US $)']),\
+                                            unit_price=D(format_price(row['UNIT_PRICE (US $)'])),\
                                             quantity=D(row['QUANTITY_ORDERED']),\
                                             supplier=supplier)
                                         new_purchase.save()
@@ -122,8 +131,7 @@ def import_csv(args):
                                         if datestr is not None:
                                             if datestr != '':
                                                 month, day, year = datestr.split('/')
-                                                millenium = '20'
-                                                real_year = millenium + year
+                                                real_year = '20' + year
                                                 return datetime.date(month=int(month),\
                                                     day=int(day), year=int(real_year))
                                             else:
@@ -161,9 +169,9 @@ def import_csv(args):
                                             tad=clean_tad, tafd=clean_tafd,\
                                             reference=row['PO_REFERENCE'],\
                                             type=row['PO_TYPE'],\
-                                            total_value=D(row['PO Total Value']),\
+                                            total_value=D(format_price(row['PO Total Value'])),\
                                             fraction_of_tv=D(clean_fraction),\
-                                            amount_usd=D(row['PO_AMOUNT_USD']),\
+                                            amount_usd=D(format_price(row['PO_AMOUNT_USD'])),\
                                             budget_year=int(row['BUDGET_YEAR']),\
                                             item_line_value=row['Item Line Value'][2],\
                                             old_book_g=row['Old Book G'][2],\
