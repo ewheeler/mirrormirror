@@ -70,5 +70,5 @@ class Category(models.Model):
     name = models.CharField(max_length=160, blank=True, null=True)
 
 class Supplier(models.Model):
-    name = models.CharField(max_length=160, blank=True, null=True)
+    name = models.CharField(max_length=500, blank=True, null=True)
     country = models.ForeignKey(Country)
