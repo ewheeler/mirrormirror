@@ -151,16 +151,21 @@ def import_csv(args):
                                         print row
                                         continue
 
+
                                     # expecting -DD.DD%
                                     # chop off % and cast as decimal
                                     try:
-                                        clean_fraction = D(row['Fraction of Total PO Value'][:-1])
+                                        clean_fraction = row['Fraction of Total PO Value'][:-1]
+                                        if clean_fraction.isdigit():
+                                            clean_fraction = D(clean_fraction)
+                                        else:
+                                            clean_fraction = None
                                     except Exception, e:
                                         print 'BANG fraction:'
                                         print e
                                         print po_count
                                         print row
-                                        continue
+                                        clean_fraction = None
 
                                     try:
                                         new_po = PurchaseOrder(country=country,\
@@ -170,9 +175,7 @@ def import_csv(args):
                                             reference=row['PO_REFERENCE'],\
                                             type=row['PO_TYPE'],\
                                             total_value=D(format_price(row['PO Total Value'])),\
-                                            fraction_of_tv=D(clean_fraction),\
                                             amount_usd=D(format_price(row['PO_AMOUNT_USD'])),\
-                                            budget_year=int(row['BUDGET_YEAR']),\
                                             item_line_value=row['Item Line Value'][2],\
                                             old_book_g=row['Old Book G'][2],\
                                             new_book_g=row['New Book G'][2],\
@@ -180,6 +183,10 @@ def import_csv(args):
                                             proms_uid=row['ProMS uid'],\
                                             additional_info=row['MATERIAL_ADDITIONAL_INFO'],\
                                             purchase=new_purchase)
+                                        if has_datum(row, 'BUDGET_YEAR'):
+                                            new_po.budget_year=int(row['BUDGET_YEAR'])
+                                        if clean_fraction is not None:
+                                            new_po.fraction_of_tv=clean_fraction
                                         new_po.save()
                                         po_count += 1
                                         if po_count % 400 == 0:
