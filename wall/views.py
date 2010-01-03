@@ -4,9 +4,33 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext
+from django.db.models import Sum
 
 from models import *
 
 def index(req):
     return render_to_response("index.html")
 
+def minnesota(req):
+    years = [2005, 2006, 2007, 2008]
+    countries = Country.objects.all()
+    countries_counts = []
+    for country in countries:
+        print country.name
+        pos = country.purchaseorder_set
+        small = []
+        medium = []
+        large = []
+
+        for year in years:
+            for month in range(13)[1:]:
+                pos_mo = pos.filter(issue_date__year=year, issue_date__month=month)
+                #po_amt = pos_mo.filter(new_book_g='A').aggregate(Sum('amount_usd'))['amount_usd__sum']
+                small.append(pos_mo.filter(new_book_g='A').count())
+                #medium.append(pos_mo.filter(new_book_g='B').count())
+                #large.append(pos_mo.filter(new_book_g='C').count())
+
+        #countries_counts.update({country.name:{"small":small, "medium":medium, "large":large}})
+        countries_counts.append({"name":str(country.name), "values":small})
+    print countries_counts
+    return render_to_response("index.html", {"minnesota":countries_counts})
