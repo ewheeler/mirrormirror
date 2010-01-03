@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<script type="text/javascript" src="/assets/js/flare.js"></script>
+    <style type="text/css">
+      #fig {
+        width: 1024px;
+        height: 1024px;
+        text-align: center;
+      }
+    </style>
+
+  <div id="center"><div id="fig">
+    <div id="title"></div>
+<script type="text/javascript+protovis">
+
+      /* The sunburst layout. */
+      var sunburst = pv.Layout.sunburst(flare).root("unicef");
+
+      /* The root panel. */
+      var vis = new pv.Panel()
+          .width(1024)
+          .height(1024)
+          .top(10);
+
+      /* Add a wedge with label using the layout. */
+      vis.add(pv.Wedge)
+          .extend(sunburst)
+          .fillStyle(pv.Colors.category19()
+              .by(function(n) n.children ? n.keys : n.keys.slice(0, -1)))
+          .strokeStyle("#222")
+          .lineWidth(1)
+          .title(function(n) n.keys.join(".") + ": " + n.size)
+          .cursor("pointer")
+        .anchor("center").add(pv.Label)
+          .visible(function(n) n.angle * n.depth > .05)
+          .text(function(n) n.keys[n.keys.length - 1] + ": " + n.size);
+
+      vis.render();
+
+    </script>
+{% endblock %}

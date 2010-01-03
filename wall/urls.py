@@ -11,4 +11,5 @@ urlpatterns = patterns('',
     url(r'^assets/js/(?P<path>.*)$', "django.views.static.serve",
     {"document_root": os.path.dirname(__file__) + "/static/javascripts"}),
     url(r'^$', views.index),
+    url(r'^tree$', views.show_tree),
 )
