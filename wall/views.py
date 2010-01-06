@@ -13,25 +13,42 @@ def index(req):
 
 def minnesota(req):
     years = [2005, 2006, 2007, 2008]
-    countries = Country.objects.filter(name__istartswith="U")
+    countries = Country.objects.all()
     countries_counts = []
     for country in countries:
         print country.name
         pos = country.purchaseorder_set
-        small = []
-        medium = []
-        large = []
+        totals = []
+        smalls = []
+        smalls_ratios = []
+        mediums = []
+        mediums_ratios = []
+        larges = []
+        larges_ratios = []
 
         for year in years:
             for month in range(13)[1:]:
                 pos_mo = pos.filter(issue_date__year=year, issue_date__month=month)
                 #po_amt = pos_mo.filter(new_book_g='A').aggregate(Sum('amount_usd'))['amount_usd__sum']
-                small.append(pos_mo.filter(new_book_g='A').count())
-                medium.append(pos_mo.filter(new_book_g='B').count())
-                large.append(pos_mo.filter(new_book_g='C').count())
+                total =  pos_mo.count()
+                totals.append(total)
+                small = pos_mo.filter(new_book_g='A').count()
+                smalls.append(small)
+                medium = pos_mo.filter(new_book_g='B').count()
+                mediums.append(medium)
+                large = pos_mo.filter(new_book_g='C').count()
+                larges.append(large)
+                if total != 0:
+                    smalls_ratios.append( int((float(small)/float(total))*100) )
+                    mediums_ratios.append( int((float(medium)/float(total))*100) )
+                    larges_ratios.append( int((float(large)/float(total))*100) )
+                else:
+                    smalls_ratios.append(0)
+                    mediums_ratios.append(0)
+                    larges_ratios.append(0)
 
         #countries_counts.update({country.name:{"small":small, "medium":medium, "large":large}})
-        countries_counts.append({"name":str(country.name), "values": {"small":small, "medium":medium, "large":large}})
+        countries_counts.append({"name":str(country.name), "smalls_ratios":smalls_ratios, "smalls":smalls, "mediums_ratios":mediums_ratios, "mediums":mediums, "larges_ratios":larges_ratios, "larges":larges, "totals":totals})
     print countries_counts
     return render_to_response("index.html", {"minnesota":countries_counts})
 

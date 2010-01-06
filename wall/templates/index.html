@@ -1,16 +1,40 @@
 {% extends "layout.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
+<div id="center"><div id="fig">
+<div style="text-align:right;padding-right:20;">
+    Highlight: <select id="menu" onchange="update(this.value)">
+    <option value="smalls" selected>Under $1000</option>
+    <option value="mediums">$1000 - $2500</option>
+    <option value="larges">Over $2500</option>
+    </select>
+</div>
 <script type="text/javascript" src="/assets/js/minnesota.js"></script>
     <script type="text/javascript+protovis">
 
       var w = 200, h = 30;
 
-      /* Color by maximum number of people employed in that job. */
-      var c = pv.Scale.log(minnesota, function(d) pv.max(d.values))
+      var active_po_type = "smalls"
+
+      function po_data(d) {
+        return d[active_po_type]
+      }
+
+      function po_ratios(d) {
+        return d[active_po_type + "_ratios"]
+      }
+
+      /* Color by maximum number of POs in that country. */
+      var ct = pv.Scale.log(minnesota, function(d) pv.max(d.totals))
+          .range("#ccc", "#1f77b4");
+      var cs = pv.Scale.log(minnesota, function(d) pv.max(po_data(d)))
+          .range("#fdd", "#f00");
+      var cm = pv.Scale.log(minnesota, function(d) pv.max(po_data(d)))
+          .range("#dfd", "#0f0");
+      var cl = pv.Scale.log(minnesota, function(d) pv.max(po_data(d)))
           .range("#ccc", "#1f77b4");
 
-      /* Tile the visualization for each job. */
+      /* Tile the visualization for each country. */
       var vis = new pv.Panel()
           .data(minnesota)
           .width(w)
@@ -23,18 +47,41 @@
       /* A panel instance to store scales (x, y) and the mouseover index (i). */
       var panel = vis.add(pv.Panel)
           .def("i", -1)
-          .def("x", function(d) pv.Scale.linear(d.values, pv.index).range(0, w))
-          .def("y", function(d) pv.Scale.linear(0, pv.max(d.values)).range(0, h))
+          .def("x", function(d) pv.Scale.linear(d.totals, pv.index).range(0, w))
+          .def("y", function(d) pv.Scale.linear(0, pv.max(d.totals)).range(0, h))
           .bottom(10);
 
-      /* The area. */
-      panel.add(pv.Area)
-          .data(function(d) d.values)
-          .def("fillStyle", function(d) panel.i() < 0 ? c(pv.max(d.values)) : "#2ca02c")
+      var smalls_area = panel.add(pv.Area)
+          .data(function(d) d.smalls)
+          .def("fillStyle", function(d) panel.i() < 0 ? cs(pv.max(d.smalls)) : "#f00")
           .left(function() panel.x()(this.index))
           .height(function(d) panel.y()(d))
           .bottom(0);
 
+      var mediums_area = smalls_area.add(pv.Area)
+          .data(function(d) d.mediums)
+          .def("fillStyle", function(d) panel.i() < 0 ? cm(pv.max(d.mediums)) : "#dfd")
+          .bottom(function() smalls_area.bottom() + smalls_area.height())
+
+      mediums_area.add(pv.Area)
+          .data(function(d) d.larges)
+          .def("fillStyle", function(d) panel.i() < 0 ? cl(pv.max(d.larges)) : "#ccc")
+          .bottom(function() mediums_area.bottom() + mediums_area.height())
+/*
+      panel.add(pv.Area)
+          .data(function(d) d.totals)
+          .def("fillStyle", function(d) panel.i() < 0 ? ct(pv.max(d.totals)) : "#2ca02c")
+          .left(function() panel.x()(this.index))
+          .height(function(d) panel.y()(d))
+          .bottom(0);
+
+      panel.add(pv.Area)
+          .data(function(d) po_data(d))
+          .def("fillStyle", function(d) panel.i() < 0 ? cs(pv.max(po_data(d))) : "#00f")
+          .left(function() panel.x()(this.index))
+          .height(function(d) panel.y()(d))
+          .bottom(0);
+*/
       /* The x-axis. */
       panel.add(pv.Rule)
           .bottom(.5);
@@ -43,12 +90,12 @@
       panel.add(pv.Dot)
           .visible(function() panel.i() >= 0)
           .left(function() panel.x()(panel.i()))
-          .bottom(function(d) panel.y()(d.values[panel.i()]))
+          .bottom(function(d) panel.y()(po_data(d)[panel.i()]))
           .fillStyle("#ff7f0e")
           .strokeStyle(null)
           .size(10);
 
-      /* The label: either the job name, or the month and value. */
+      /* The label: either the country name, or the month and values. */
       panel.add(pv.Label)
           .bottom(-1)
           .textBaseline("top")
@@ -58,7 +105,8 @@
           .textStyle(function() panel.i() < 0 ? "#999" : "#000")
           .text(function(d) panel.i() < 0 ? d.name
               : new Date(2005, panel.i(), 1).format("%B %Y")
-              + ": " + d.values[panel.i()]);
+              + ": " + po_ratios(d)[panel.i()] + "% " + po_data(d)[panel.i()] + "/" + d.totals[panel.i()]);
+
 
       /* An invisible bar to capture events (without flickering). */
       panel.add(pv.Bar)
@@ -67,6 +115,13 @@
           .event("mousemove", function() panel.i(panel.x().invert(panel.mouse().x) >> 0));
 
       vis.render();
+
+      /* Update the comparison po type and re-render. */
+      function update(data_name) {
+        active_po_type = data_name
+        vis.render();
+      }
+
 
     </script>
 
