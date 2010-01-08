@@ -13,4 +13,5 @@ urlpatterns = patterns('',
     url(r'^$', views.index),
     url(r'^tree$', views.show_tree),
     url(r'^voyager$', views.show_voyager),
+    url(r'^lines$', views.show_lines),
 )

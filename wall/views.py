@@ -99,3 +99,6 @@ def prep_voyager(req):
 
 def show_voyager(req):
     return render_to_response("voyager.html")
+
+def show_lines(req):
+    return render_to_response("lines.html")
