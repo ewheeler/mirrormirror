@@ -20,8 +20,8 @@
     </p>
     <div id="center"><div id="fig">
     <div style="text-align:right;padding-right:20;">
-      Show: <select id="region" onchange="update()">
-        <option value=0 selected>All regions</option>
+      Show: <select id="region" onchange="update(this)">
+        <option value="ALL" selected>All regions</option>
         <option value="ROSA">ROSA</option>
         <option value="CEE/CIS">CEE/CIS</option>
         <option value="MENA">MENA</option>
@@ -33,7 +33,6 @@
       </select>
     </div>
     <script type="text/javascript+protovis">
-      var region = 0;
 
       /* Flatten the tree into an array to faciliate transformation. */
       var jobs = pv.flatten(jobs)
@@ -145,8 +144,9 @@
 
       /* Tests to see whether the specified datum matches the current filters. */
       var re = "";
+      var region = document.getElementById('region');
       function test(d) {
-        return (!Number(region.value) || (region.value == d.region))
+        return (region.value == "ALL" || region.value == d.region)
             && d.category.match(re);
       }
 
