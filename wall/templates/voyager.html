@@ -51,7 +51,7 @@
           .key(function(d) d.year)
           .rollup(function(v) pv.sum(v, function(d) d.pos)),
         sumByCat = pv.nest(jobs)
-          .key(function(d) d.region + d.category)
+          .key(function(d) d.region + " " + d.category)
           .rollup(function(v) pv.sum(v, function(d) d.pos));
 
       /* Cache the percentage of pos per month. */
@@ -91,7 +91,7 @@
       /* A stacked area graph. */
       var area = vis.add(pv.Panel)
           .data(pv.nest(jobs)
-              .key(function(d) d.region + d.category)
+              .key(function(d) d.region + " " + d.category)
               .sortKeys(function(b, a) pv.reverseOrder(a.substring(1), b.substring(1)))
               .entries())
           .visible(function(d) test(d.values[0]))
@@ -102,7 +102,7 @@
           .bottom(pv.Layout.stack())
           .height(function(d) y(d.percent))
           .fillStyle(function(d) color(d.region).alpha(this.alpha()))
-          .event("mouseover", function(d) this.alpha(1).title(d.category + " " + d.region))
+          .event("mouseover", function(d) this.alpha(1).title(d.region + " " + d.category))
           .event("mouseout", function(d) this.alpha(undefined))
           .event("click", function(d) search(d.category))
           .cursor("pointer")
