@@ -16,7 +16,8 @@
     </style>
     <p>
         Categories over time as percentages of total purchase orders.<br/>
-        Colored by region. X-axis shows months beginning with Jan 2005.
+        Colored by region. X-axis shows months beginning with Jan 2005.<br/>
+        Click on any band to filter by category, use the drop down to filter by region.
     </p>
     <div id="center"><div id="fig">
     <div style="text-align:right;padding-right:20;">
@@ -103,7 +104,7 @@
           .fillStyle(function(d) color(d.region).alpha(this.alpha()))
           .event("mouseover", function(d) this.alpha(1).title(d.category + " " + d.region))
           .event("mouseout", function(d) this.alpha(undefined))
-          .event("click", function(d) search("^" + d.category + "$"))
+          .event("click", function(d) search(d.category))
           .cursor("pointer")
         .parent;
 
@@ -131,6 +132,7 @@
         .anchor("bottom").add(pv.Label);
 
       /* Update the query regular expression when text is entered. */
+      var query = document.getElementById('query');
       function search(text) {
         if (text != re) {
           if (query.value != text) {
@@ -157,7 +159,6 @@
             .rollup(function(v) pv.sum(v, function(d) d.percent))))));
         vis.render();
       }
-
       vis.render();
 
     </script>
