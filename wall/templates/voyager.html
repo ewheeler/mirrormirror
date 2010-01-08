@@ -15,7 +15,7 @@
       }
     </style>
     <p>
-        Categories over time as percentages of total purchase orders.<br/>
+        Category and region POs as percentages of total purchase orders each month.<br/>
         Colored by region. X-axis shows months beginning with Jan 2005.<br/>
         Click on any band to filter by category, use the drop down to filter by region.
     </p>
@@ -143,6 +143,10 @@
           update();
         }
       }
+      function clearForm(){
+        query.value = "";
+        search("");
+      }
 
       /* Tests to see whether the specified datum matches the current filters. */
       var re = "";
@@ -163,8 +167,9 @@
 
     </script>
     <div>
-      <label for="query">search: </label>
+      <label for="query">filter: </label>
       <input id="query" type="text" onkeyup="search(this.value);">
+      <input type="button" onclick="clearForm();" value="Clear">
     </div>
 
 {% endblock %}
