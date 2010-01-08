@@ -69,3 +69,33 @@ def calc_tree(req):
         print reg_cats
     print regs_cats
     return render_to_response("tree.html")
+
+def prep_voyager(req):
+    # var years = []
+    # var jobs = {
+    # "category" : { 'region' : [], 'anotherregion' : [] },
+    # ...
+    # }
+    years = [2005, 2006, 2007, 2008]
+    regs = Region.objects.all()
+    cats = Category.objects.all()
+    cats_regs = {}
+    for cat in cats:
+        print cat.name
+        cat_regs = {}
+        for reg in regs:
+            print reg.name
+            count = []
+            for year in years:
+                for month in range(13)[1:]:
+                    num = PurchaseOrder.objects.filter(country__region=reg,\
+                        issue_date__year=year, issue_date__month=month,\
+                        category=cat).count()
+                    count.append(num)
+            cat_regs.update({str(reg.name):count})
+        cats_regs.update({str(cat.name):cat_regs})
+    print cats_regs
+    return render_to_response("voyager.html")
+
+def show_voyager(req):
+    return render_to_response("voyager.html")

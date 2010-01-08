@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     {"document_root": os.path.dirname(__file__) + "/static/javascripts"}),
     url(r'^$', views.index),
     url(r'^tree$', views.show_tree),
+    url(r'^voyager$', views.show_voyager),
 )
