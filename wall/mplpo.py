@@ -2,7 +2,7 @@ from wall.models import *
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
-def get_all_amounts():
+def get_all_amts():
     print 'getting PO amounts...'
     all_amount_usd = PurchaseOrder.objects.values_list('amount_usd', flat=True).order_by('amount_usd')
     print 'found %s, converting to floats...' % len(all_amount_usd)
@@ -11,16 +11,30 @@ def get_all_amounts():
     all = all_amount_usd_f[0:362549]
     return all
 
+def get_regional_amts():
+    all = []
+    regs = Region.objects.all()
+    for reg in regs:
+        print 'getting PO amounts for %s' % reg.name
+        ramts = PurchaseOrder.objects.values_list('amount_usd', flat=True).filter(country__region=reg).order_by('amount_usd')
+        ramts_f = [float(x) for x in ramts]
+        ramts_f.append(reg.name)
+        all.append(ramts_f)
+    return all
 
-def make_hist(amts, line=False):
-    min = amts[0]
-    max = amts[-1]
+def make_hist(amts, max=20000, step=200, htype=None, line=False):
 
-    steps = range(0,20000,200)
+    steps = range(0,max,step)
+    if htype == 'barstacked':
+        print 'barstacked!'
+        for amt_list in amts:
+            if amt_list[-1] is not None:
+                if amt_list[-1] != '2006':
+                    n, bins, patches = plt.hist(amt_list[:-1], steps, normed=0,\
+                        alpha=0.75, histtype='barstacked', label=amt_list[-1])
 
-    n, bins, patches = plt.hist(amts, steps, normed=0, facecolor='green', alpha=0.75)
-    #n, bins, patches = plt.hist(amts, [0,200,400,600,800,1000,1200,1400,1600,1800,2000,20000], normed=0, facecolor='green', alpha=0.75)
-    #n, bins, patches = plt.hist(all, [0,200,400,600,800,1000,1200,1400,1600,1800,2000,2000000], normed=0, facecolor='green', alpha=0.75)
+    else:
+        n, bins, patches = plt.hist(amts, steps, normed=0, alpha=0.85, histtype='bar')
 
     def best_fit():
         mu, sigma = 100, 15
@@ -33,4 +47,6 @@ def make_hist(amts, line=False):
     plt.grid(True)
     plt.xlabel('PO Amount USD')
     plt.ylabel('Number of POs')
+    plt.axis([0,max,0,40000])
+    plt.legend()
     plt.show()
