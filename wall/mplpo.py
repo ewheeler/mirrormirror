@@ -25,7 +25,7 @@ def get_regional_amts():
                 all.append(ramts_f)
     return all
 
-def make_hist(amts, max=20000, step=200, htype=None, line=False):
+def make_hist(amts, max=20000, step=200, htype=None):
 
     steps = range(0,max,step)
     pretty = ['red','green','blue','orange','yellow','springgreen',\
@@ -40,14 +40,6 @@ def make_hist(amts, max=20000, step=200, htype=None, line=False):
     else:
         print 'plain'
         n, bins, patches = plt.hist(amts, steps, normed=0, alpha=0.85, histtype='bar')
-
-    def best_fit():
-        mu, sigma = 100, 15
-        y = mlab.normpdf( bins, mu, sigma)
-        l = plt.plot(bins, y, 'r--', linewidth=3)
-
-    if line:
-        best_fit()
 
     plt.grid(True)
     plt.xlabel('PO Amount USD')
