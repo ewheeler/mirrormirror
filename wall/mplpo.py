@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
+import matplotlib.colors as mcol
+import matplotlib.cm as cm
 from matplotlib.patches import Polygon
 
 from wall.models import *
@@ -120,6 +122,13 @@ def make_boxplot(amounts, height=None):
     boxColors = ['royalblue']
     numBoxes = len(amts)
     medians = range(numBoxes)
+    # for shading 'Blues'
+    counts = [len(a) for a in amts]
+    ndcounts = np.array(counts)
+    norm = mcol.normalize(np.amin(ndcounts), np.amax(ndcounts))
+    ncounts = [norm(c) for c in counts]
+    #cmap = plt.get_cmap('Blues')
+
     for i in range(numBoxes):
         box = bp['boxes'][i]
         boxX = []
@@ -130,7 +139,9 @@ def make_boxplot(amounts, height=None):
         boxCoords = zip(boxX,boxY)
         # Alternate between Dark Khaki and Royal Blue
         #k = i % 2
-        boxPolygon = Polygon(boxCoords, facecolor=boxColors[0])
+        # TODO shade boxes by len(amt)
+        boxPolygon = Polygon(boxCoords, facecolor=cm.Blues(ncounts[i]))
+        #boxPolygon = Polygon(boxCoords, facecolor=boxColors[0])
         ax1.add_patch(boxPolygon)
         # Now draw the median lines back over what we just filled in
         med = bp['medians'][i]
@@ -148,30 +159,32 @@ def make_boxplot(amounts, height=None):
 
 
     # Set the axes ranges and axes labels
-    ax1.set_xlim(0.5, numBoxes+0.5)
-    top = 40
+    ax1.set_xlim(0.5, numBoxes)
+    top = height 
     bottom = -5
     ax1.set_ylim(bottom, top)
     xtickNames = plt.setp(ax1, xticklabels=names)
-    plt.setp(xtickNames, rotation=45, fontsize=8)
+    plt.setp(xtickNames, rotation=90, fontsize=8)
 
     # Due to the Y-axis scale being different across samples, it can be
     # hard to compare differences in medians across the samples. Add upper
     # X-axis tick labels with the sample medians to aid in comparison
     # (just use two decimal places of precision)
-#    pos = np.arange(numBoxes)+1
-#    upperLabels = [str(np.round(s, 2)) for s in medians]
-#    weights = ['bold', 'semibold']
-#    for tick,label in zip(range(numBoxes),ax1.get_xticklabels()):
-#        k = tick# % 2
-#        ax1.text(pos[tick], top-(top*0.05), upperLabels[tick],
-#                horizontalalignment='center', size='x-small', weight=weights[0],
-#                color=boxColors[0])
+    pos = np.arange(numBoxes)+1
+    #upperLabels = [str(np.round(s, 2)) for s in medians]
+    weights = ['bold', 'semibold']
+    for tick,label in zip(range(numBoxes),ax1.get_xticklabels()):
+        ax1.text(pos[tick], top-(top*0.05), str(len(amts[tick])),
+                horizontalalignment='center', size='8', weight=weights[0],
+                color=boxColors[0])
 
     # Finally, add a basic legend
-    plt.figtext(0.75, 0.045, 'Interquartile range (25-75%) of POs',
+    plt.figtext(0.75, 0.08, 'Interquartile range (25-75%) of POs',
     backgroundcolor=boxColors[0],
             color='black', weight='roman', size='x-small')
+    plt.figtext(0.75, 0.045, 'Number of POs',
+    backgroundcolor='silver',
+            color=boxColors[0], weight='semibold', size='x-small')
     plt.figtext(0.75, 0.015, '*', color='white', backgroundcolor='silver',
             weight='roman', size='medium')
     plt.figtext(0.765, 0.013, ' Average PO amount (USD)', color='black', weight='roman',
