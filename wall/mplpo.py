@@ -1,3 +1,5 @@
+from copy import copy
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
@@ -99,8 +101,7 @@ def make_boxplot(amounts, height=None):
     ax1 = fig.add_subplot(111)
     plt.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.25)
 
-    amts = list(amounts)
-
+    amts = copy(amounts)
     names = [str(lst.pop()) for lst in amts]
 
     bp = plt.boxplot(amts, notch=0, sym='+', vert=1, whis=1.5)
@@ -118,16 +119,17 @@ def make_boxplot(amounts, height=None):
     ax1.set_title('Comparison of PO volumes')
     ax1.set_ylabel('Value (amount USD) of PO')
 
-    # Now fill the boxes with desired colors
-    boxColors = ['royalblue']
     numBoxes = len(amts)
     medians = range(numBoxes)
-    # for shading 'Blues'
+
+    # Now fill the boxes with desired colors
+    # gather number of data points in each list
     counts = [len(a) for a in amts]
     ndcounts = np.array(counts)
+    # make a normalizer based on min and max
     norm = mcol.normalize(np.amin(ndcounts), np.amax(ndcounts))
+    # gather normalized number of data points for each list
     ncounts = [norm(c) for c in counts]
-    #cmap = plt.get_cmap('Blues')
 
     for i in range(numBoxes):
         box = bp['boxes'][i]
@@ -137,11 +139,8 @@ def make_boxplot(amounts, height=None):
             boxX.append(box.get_xdata()[j])
             boxY.append(box.get_ydata()[j])
         boxCoords = zip(boxX,boxY)
-        # Alternate between Dark Khaki and Royal Blue
-        #k = i % 2
-        # TODO shade boxes by len(amt)
+        # fill box with appropriate shade from Blues colormap
         boxPolygon = Polygon(boxCoords, facecolor=cm.Blues(ncounts[i]))
-        #boxPolygon = Polygon(boxCoords, facecolor=boxColors[0])
         ax1.add_patch(boxPolygon)
         # Now draw the median lines back over what we just filled in
         med = bp['medians'][i]
@@ -176,15 +175,15 @@ def make_boxplot(amounts, height=None):
     for tick,label in zip(range(numBoxes),ax1.get_xticklabels()):
         ax1.text(pos[tick], top-(top*0.05), str(len(amts[tick])),
                 horizontalalignment='center', size='8', weight=weights[0],
-                color=boxColors[0])
+                color='royalblue')
 
     # Finally, add a basic legend
     plt.figtext(0.75, 0.08, 'Interquartile range (25-75%) of POs',
-    backgroundcolor=boxColors[0],
+    backgroundcolor='royalblue',
             color='black', weight='roman', size='x-small')
     plt.figtext(0.75, 0.045, 'Number of POs',
     backgroundcolor='silver',
-            color=boxColors[0], weight='semibold', size='x-small')
+            color='royalblue', weight='semibold', size='x-small')
     plt.figtext(0.75, 0.015, '*', color='white', backgroundcolor='silver',
             weight='roman', size='medium')
     plt.figtext(0.765, 0.013, ' Average PO amount (USD)', color='black', weight='roman',
