@@ -7,7 +7,12 @@ import matplotlib.colors as mcol
 import matplotlib.cm as cm
 from matplotlib.patches import Polygon
 
+from scipy import stats
+
 from wall.models import *
+
+#export PYTHONPATH=/Users/ewheeler/dev/
+#export DJANGO_SETTINGS_MODULE=mirrormirror.settings
 
 def get_all_amts():
     print 'getting PO amounts...'
