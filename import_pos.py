@@ -68,6 +68,7 @@ def import_csv(args):
                             print row
                             continue
 
+                        # TODO make sure to handle suppliers with only name and not country
                         if has_data(row, ['SUPPLIER_COUNTRY', 'SUPPLIER_NAME']):
                             try:
                                 supplier_country, created = Country.objects.get_or_create(name=row['SUPPLIER_COUNTRY'])

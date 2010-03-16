@@ -6,6 +6,7 @@ from django.db import models
 class Country(models.Model):
     name = models.CharField(max_length=160, blank=True, null=True)
     region = models.ForeignKey('Region', blank=True, null=True)
+    # TODO add ISO and UN country codes
 
 class Region(models.Model):
     name = models.CharField(max_length=160, blank=True, null=True)
