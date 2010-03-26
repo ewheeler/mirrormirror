@@ -5,7 +5,8 @@ TEMPLATE_DEBUG = DEBUG
 ROOT_URLCONF = 'examples.urls'
 TEMPLATE_DIRS = ('/Users/ewheeler/dev/mirrormirror/wall/templates',)
 DATABASE_ENGINE = 'mysql'
-DATABASE_NAME = 'mirror'
+#DATABASE_NAME = 'mirror'
+DATABASE_NAME = 'bigsky'
 DATABASE_USER = 'unicef'
 DATABASE_PASSWORD = 'm3p3m3p3'
 DATABASE_HOST = 'localhost'
@@ -55,4 +56,5 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'mirrormirror.wall',
+    'mirrormirror.bigsky',
 )
